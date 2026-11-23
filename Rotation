@@ -1,0 +1,82 @@
+#include <GL/glut.h>
+#include <math.h>
+
+#define PI 3.14159265358979323846
+
+// Initial coordinates of the 2D triangle
+float x1 = -0.3f, y1_coord = -0.3f;
+float x2 =  0.3f, y2_coord = -0.3f;
+float x3 =  0.0f, y3_coord =  0.4f;
+
+// Rotation angle in degrees
+float angleDegrees = 0.0f;
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glLoadIdentity();
+
+    // Convert angle from degrees to radians for math.h functions
+    float rad = angleDegrees * (PI / 180.0f);
+
+    // Apply 2D Rotation Formula:
+    // x' = x * cos(θ) - y * sin(θ)
+    // y' = x * sin(θ) + y * cos(θ)
+
+    float rx1 = x1 * cos(rad) - y1_coord * sin(rad);
+    float ry1 = x1 * sin(rad) + y1_coord * cos(rad);
+
+    float rx2 = x2 * cos(rad) - y2_coord * sin(rad);
+    float ry2 = x2 * sin(rad) + y2_coord * cos(rad);
+
+    float rx3 = x3 * cos(rad) - y3_coord * sin(rad);
+    float ry3 = x3 * sin(rad) + y3_coord * cos(rad);
+
+    // Draw the rotated triangle using calculated points
+    glBegin(GL_TRIANGLES);
+        glColor3f(1.0f, 0.0f, 0.0f); // Red vertex
+        glVertex2f(rx1, ry1);
+
+        glColor3f(0.0f, 1.0f, 0.0f); // Green vertex
+        glVertex2f(rx2, ry2);
+
+        glColor3f(0.0f, 0.0f, 1.0f); // Blue vertex
+        glVertex2f(rx3, ry3);
+    glEnd();
+
+    glutSwapBuffers();
+}
+
+void timer(int value) {
+    // Increase angle for animation
+    angleDegrees += 2.0f;
+    if (angleDegrees >= 360.0f) {
+        angleDegrees -= 360.0f;
+    }
+
+    glutPostRedisplay();
+    glutTimerFunc(16, timer, 0); // ~60 FPS
+}
+
+void init() {
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black background
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(-1.0, 1.0, -1.0, 1.0); // 2D Cartesian Coordinate System
+    glMatrixMode(GL_MODELVIEW);
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(500, 500);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("2D Rotation without glRotatef");
+
+    init();
+
+    glutDisplayFunc(display);
+    glutTimerFunc(0, timer, 0);
+
+    glutMainLoop();
+    return 0;
+}
