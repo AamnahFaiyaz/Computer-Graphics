@@ -1,0 +1,78 @@
+#include <GL/glut.h>
+#include <iostream>
+#include <cmath>
+
+// Define line endpoints
+int x_start = 50, y_start = 50;
+int x_end = 300, y_end = 200;
+
+// Function to plot a pixel
+void drawPixel(int x, int y) {
+    glBegin(GL_POINTS);
+        glVertex2i(x, y);
+    glEnd();
+}
+
+// Bresenham's Line Algorithm using Decision Parameter (p_k)
+void bresenhamLineWithDecision(int x1, int y1, int x2, int y2) {
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+
+    // Initial decision parameter p0 = 2*dy - dx
+    int p = 2 * dy - dx;
+
+    // Constants for decision updates
+    int two_dy = 2 * dy;
+    int two_dy_minus_dx = 2 * (dy - dx);
+
+    int x = x1;
+    int y = y1;
+
+    // Plot initial starting point
+    drawPixel(x, y);
+
+    while (x < x2) {
+        x++; // x always steps by 1 in the primary direction
+
+        if (p < 0) {
+            // Case 1: Choose lower pixel (y remains same)
+            p += two_dy;
+        } else {
+            // Case 2: Choose upper pixel (y increments)
+            y++;
+            p += two_dy_minus_dx;
+        }
+
+        drawPixel(x, y);
+    }
+}
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0, 1.0, 1.0); // White line color
+
+    // Draw line
+    bresenhamLineWithDecision(x_start, y_start, x_end, y_end);
+
+    glFlush();
+}
+
+void init() {
+    glClearColor(0.0, 0.0, 0.0, 1.0); // Black background
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, 500, 0, 500); // Set 2D orthographic view
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(500, 500);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("Bresenham Line Algorithm (Decision Parameter)");
+
+    init();
+    glutDisplayFunc(display);
+    glutMainLoop();
+    return 0;
+}
